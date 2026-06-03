@@ -14,7 +14,7 @@ const options: swaggerJsDoc.Options = {
 
     servers: [
       {
-        url: "http://localhost:5000/api/auth",
+        url: "http://localhost:5000",
       },
     ],
 

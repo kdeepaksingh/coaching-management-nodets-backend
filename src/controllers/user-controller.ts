@@ -414,6 +414,39 @@ const logout = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const logoutWithCookies = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      res.status(400).json({
+        success: false,
+        message: "Refresh token not found",
+      });
+      return;
+    }
+
+    await tokenModel.deleteOne({
+      refreshToken,
+    });
+
+    res.clearCookie("refreshToken");
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const userController = {
   registerUser,
   verifyOtp,
@@ -423,4 +456,5 @@ export const userController = {
   forgotPassword,
   resetPassword,
   logout,
+  logoutWithCookies,
 };
