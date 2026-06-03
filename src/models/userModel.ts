@@ -1,45 +1,81 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import type { IUser } from "../interfaces/user-interface.js";
 
-export interface IUserModel extends IUser, Document {}
-
-export const userSchema = new Schema<IUserModel>(
+const userSchema = new Schema<IUser>(
   {
-    name: {
+    fullName: {
       type: String,
       required: true,
+      trim: true,
     },
+
     email: {
       type: String,
       required: true,
+      unique: true,
+      lowercase: true,
     },
-    mobileNo: {
+
+    mobileNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    roleType: {
+      type: String,
+      enum: ["admin", "teacher", "student", "parent"],
+      required: true,
+    },
+
+    profilePicture: {
+      type: String,
+      default: "",
+    },
+
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+      required: true,
+    },
+
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
+
+    address: {
       type: String,
       required: true,
     },
+
     password: {
       type: String,
       required: true,
     },
-    verificationCode: {
-      type: String,
-      required: true,
+
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
     },
-    resetToken: {
-      type: String,
+
+    isMobileVerified: {
+      type: Boolean,
+      default: false,
     },
-    resetTokenExpiry: {
-      type: Date,
+
+    isActive: {
+      type: Boolean,
+      default: true,
     },
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user",
-    },
+
+    lastLogin: Date,
+
+    refreshToken: String,
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
-const userModel = mongoose.model<IUserModel>("User", userSchema);
-
-export default userModel;
+export default mongoose.model<IUser>("User", userSchema);

@@ -3,10 +3,12 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import path from "path";
+import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import appLoger from "./middleware/appLoger.js";
-
+import { setupSwagger } from "./config/swagger.js";
+import userRouter from "./routes/user-router.js";
 // Load environment variables from.env file
 dotenv.config();
 
@@ -18,12 +20,12 @@ const __dirname = path.dirname(__filename);
 
 // Express app initialization
 const app: Application = express();
-// setupSwagger(app as Express);
 
 // App Configuration
 const hostName: string = String(process.env.HOSTNAME);
 const port: number = Number(process.env.PORT) || 5000;
 
+app.use(cookieParser());
 // Middleware to parse JSON request bodies
 app.use(cors()); // it is used for enabling CORS (Cross-Origin Resource Sharing) for cross-origin requests
 // Allow all origins (for development)
@@ -44,8 +46,9 @@ app.use(appLoger); // it is used for logging, its a custom logger middleware
 app.use(morgan("dev")); // it is used for logging, its a third party library middleware
 
 // Routes Adding below
-// app.use("/auth/api", userRouter);
+app.use("/auth/api", userRouter);
 
+setupSwagger(app as Express);
 app.listen(port, hostName, () => {
   console.log(`Server running at http://${hostName}:${port}`);
 });
