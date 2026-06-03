@@ -3,14 +3,18 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import path from "path";
+import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import appLoger from "./middleware/appLoger.js";
+
+// Load environment variables from.env file
+dotenv.config();
 
 // Connect to MongoDB
 connectDB();
 
-// Load environment variables from.env file
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Express app initialization
 const app: Application = express();
