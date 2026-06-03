@@ -46,7 +46,7 @@ app.use(appLoger); // it is used for logging, its a custom logger middleware
 app.use(morgan("dev")); // it is used for logging, its a third party library middleware
 
 // Routes Adding below
-app.use("/auth/api", userRouter);
+app.use("/api/auth", userRouter);
 
 setupSwagger(app as Express);
 app.listen(port, hostName, () => {
