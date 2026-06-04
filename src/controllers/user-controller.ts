@@ -89,7 +89,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({
       success: true,
-      message: "Registration successful. Please verify OTP.",
+      message: "User registration successfully. Please verify OTP.",
       data: {
         userId: user._id,
         email: user.email,
