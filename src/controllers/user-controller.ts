@@ -517,6 +517,88 @@ const logoutWithCookies = async (
   }
 };
 
+const getProfile = async (req: Request & { user?: any }, res: Response) => {
+  try {
+    const user = await userModel
+      .findById(req.user.userId)
+      .select("-password -refreshToken");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateProfile = async (req: Request & { user?: any }, res: Response) => {
+  try {
+    const {
+      fullName,
+      mobileNumber,
+      gender,
+      dateOfBirth,
+      address,
+      profilePicture,
+    } = req.body;
+
+    const user = await userModel.findByIdAndUpdate(
+      req.user.userId,
+      {
+        fullName,
+        mobileNumber,
+        gender,
+        dateOfBirth,
+        address,
+        profilePicture,
+      },
+      {
+        new: true,
+      },
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const logoutByUserID = async (req: Request & { user?: any }, res: Response) => {
+  try {
+    await tokenModel.deleteMany({
+      userId: req.user.userId,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const userController = {
   registerUser,
   verifyOtp,
@@ -528,4 +610,7 @@ export const userController = {
   logout,
   logoutWithCookies,
   verifyForgotPasswordOtp,
+  getProfile,
+  updateProfile,
+  logoutByUserID,
 };

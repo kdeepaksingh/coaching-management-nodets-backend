@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { userController } from "../controllers/user-controller.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const userRouter = Router();
 
@@ -14,5 +15,9 @@ userRouter.post("/refresh-token", userController.refreshToken);
 userRouter.post("/forgot-password", userController.forgotPassword);
 userRouter.post("/reset-password", userController.resetPassword);
 userRouter.post("/logout", userController.logout);
+
+userRouter.post("/logout", authMiddleware, userController.logoutByUserID);
+userRouter.get("/profile", authMiddleware, userController.getProfile);
+userRouter.put("/update-profile", authMiddleware, userController.updateProfile);
 
 export default userRouter;
