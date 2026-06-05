@@ -5,6 +5,9 @@ const userRouter = Router();
 
 userRouter.route("/register").post(userController.registerUser);
 userRouter.route("/verify-otp").post(userController.verifyOtp);
+userRouter
+  .route("/verify-forgot-password-otp")
+  .post(userController.verifyForgotPasswordOtp);
 userRouter.post("/resend-otp", userController.resendOtp);
 userRouter.post("/login", userController.login);
 userRouter.post("/refresh-token", userController.refreshToken);

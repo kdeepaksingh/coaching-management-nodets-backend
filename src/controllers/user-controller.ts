@@ -21,7 +21,16 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
       dateOfBirth,
       address,
       password,
+      confirmPassword,
     } = req.body;
+
+    if (password !== confirmPassword) {
+      res.status(400).json({
+        success: false,
+        message: "Passwords do not match",
+      });
+      return;
+    }
 
     // Check Email
     const existingEmail = await userModel.findOne({
@@ -51,6 +60,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 
     // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedConfirmPassword = await bcrypt.hash(confirmPassword, 10);
 
     // Create User
     const user = await userModel.create({
@@ -63,6 +73,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
       dateOfBirth,
       address,
       password: hashedPassword,
+      confirmPassword: hashedConfirmPassword,
 
       isEmailVerified: false,
       isMobileVerified: false,
@@ -154,6 +165,47 @@ const verifyOtp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const verifyForgotPasswordOtp = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { email, otp } = req.body;
+
+    const otpRecord = await otpModel.findOne({
+      email,
+      otp,
+      purpose: "FORGOT_PASSWORD",
+    });
+
+    if (!otpRecord) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+      return;
+    }
+
+    if (otpRecord.expiresAt.getTime() < Date.now()) {
+      res.status(400).json({
+        success: false,
+        message: "OTP expired",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const resendOtp = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email } = req.body;
@@ -230,6 +282,9 @@ const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    user.lastLogin = new Date();
+    await user.save();
+
     const payload = {
       userId: user._id,
       email: user.email,
@@ -246,11 +301,16 @@ const login = async (req: Request, res: Response): Promise<void> => {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
+    const userData = user.toObject();
+
+    delete (userData as any).password;
+    delete (userData as any).refreshToken;
+
     res.status(200).json({
       success: true,
       accessToken,
       refreshToken,
-      user,
+      user: userData,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -344,7 +404,15 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
 
 const resetPassword = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, otp, newPassword } = req.body;
+    const { email, otp, newPassword, confirmPassword } = req.body;
+
+    if (newPassword !== confirmPassword) {
+      res.status(400).json({
+        success: false,
+        message: "Passwords do not match",
+      });
+      return;
+    }
 
     const otpRecord = await otpModel.findOne({
       email,
@@ -369,11 +437,13 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedConfirmPassword = await bcrypt.hash(confirmPassword, 10);
 
     await userModel.updateOne(
       { email },
       {
         password: hashedPassword,
+        confirmPassword: hashedConfirmPassword,
       },
     );
 
@@ -457,4 +527,5 @@ export const userController = {
   resetPassword,
   logout,
   logoutWithCookies,
+  verifyForgotPasswordOtp,
 };

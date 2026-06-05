@@ -29,6 +29,7 @@ export interface IUser {
   address: string;
 
   password: string;
+  confirmPassword: string;
 
   isEmailVerified: boolean;
 

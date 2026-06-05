@@ -49,6 +49,26 @@
 
 /**
  * @swagger
+ * /api/auth//verify-forgot-password-otp:
+ *   post:
+ *     summary: Verify Forgot OTP
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VerifyOtpRequest'
+ *     responses:
+ *       200:
+ *         description: OTP Verified Successfully
+ *       400:
+ *         description: Invalid OTP
+ */
+
+/**
+ * @swagger
  * /api/auth/resend-otp:
  *   post:
  *     summary: Resend OTP
