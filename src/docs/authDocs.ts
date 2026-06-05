@@ -121,6 +121,50 @@
 
 /**
  * @swagger
+ * /api/auth/profile:
+ *   get:
+ *     summary: Get Logged In User Profile
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserProfile'
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
+ * /api/auth/update-profile:
+ *   put:
+ *     summary: Update User Profile
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateProfileRequest'
+ *     responses:
+ *       200:
+ *         description: Profile Updated Successfully
+ *       400:
+ *         description: Validation Error
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
  * /api/auth/forgot-password:
  *   post:
  *     summary: Forgot Password
